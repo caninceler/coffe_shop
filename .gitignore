@@ -5,6 +5,10 @@ Intermediate/
 Saved/
 .vs/
 
+# Tooling cache/backup folders (Codex etc.) — never commit
+.codex-cache-backup-*/
+*ShaderAutogen*/
+
 # Build artifacts
 *.VC.db
 *.opensdf
