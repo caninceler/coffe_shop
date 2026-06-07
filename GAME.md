@@ -17,7 +17,9 @@ Oyunun her tasarım kararı şu üç sütuna hizmet etmelidir:
 
 1. **"Tezgahın arkasındayım" hissi** — Oyuncu gerçekten bir baristadır. Kahve yapmak elle, adım adım, tatmin edici bir etkileşimdir; menüden seçilen soyut bir işlem değil.
 2. **Görünür büyüme** — Kazanılan her para dükkanda fiziksel olarak görülür: yeni makineler, daha fazla masa, dekorasyon, genişleyen mekan. İlerleme gözle takip edilebilir olmalı.
-3. **Yönetilebilir kaos** — Yoğunluk arttıkça (daha fazla müşteri, daha karmaşık siparişler) baskı artar; oyuncu sistemleri optimize ederek (personel, ekipman, düzen) bu kaosu yönetir.
+3. **Cozy & cezasız akış** — Oyun rahatlatıcıdır; zaman baskısı, başarısızlık cezası veya "kaybetme" durumu **yoktur**. İlerleme her zaman ileri yöndedir. Yoğunluk hissi vardır ama stres değil; oyuncu istediği tempoda oynar.
+
+> **Cozy çekirdek (değişmez kural):** Bu bir **cozy** oyundur. **Zaman sınırı yok, challenge yok, ceza sistemi yok.** Hiçbir mekanik oyuncuyu cezalandırmamalı (para sıfırlama, oyun sonu, başarısızlık ekranı YOK). Olumsuz olaylar en fazla "ödül kazanmama" veya "küçük XP düşüşü" olabilir — asla geriye dönük yıkım değil. Oyun sonsuza dek dönebilir/oynanabilir olmalı. Müzik her zaman çalar ve atmosferin parçasıdır.
 
 ### 1.3 Hedef Kitle & Referanslar
 - **Hedef kitle:** İşletme/simülasyon oyunu sevenler, cozy + tycoon kesişimi.
@@ -39,22 +41,28 @@ PREP (Hazırlık)  →  SERVICE (Servis/Yoğunluk)  →  CLOSE (Kapanış)  → 
 | Mekanik | Açıklama | Öncelik |
 |---|---|---|
 | **First-person etkileşim** | Bak + etkileşim tuşu (E) ile objelerle etkileşim. `BPI_Interact` arayüzü kullanılır. | MVP |
-| **Kahve hazırlama** | Adımlı süreç: bardak al → makine/öğütücü kullan → süt/şurup ekle → servis et. | MVP |
-| **Sipariş sistemi** | Müşteri belirli bir ürün ister; oyuncu doğru ürünü doğru şekilde hazırlamalı. | MVP |
-| **Müşteri & sıra (queue)** | Müşteriler gelir, sıraya girer, sipariş verir, sabır göstergesi azalır. | MVP |
-| **Para & ekonomi** | Satıştan gelir, malzeme/fatura gideri, bahşiş. | MVP |
-| **Upgrade / satın alma** | Ekipman, mobilya, dekor, mekan. Görünür kurulum. | MVP+1 |
-| **Stok yönetimi** | Çekirdek, süt, bardak, şurup tükenir; sipariş edilir. | MVP+1 |
+| **Kahve / içecek hazırlama** | Adımlı süreç: bardak al → istasyonları kullan → servis et. İçerik istasyonları: **süt, kahve, su, şurup, buz, sıcak su, soğuk su**. | MVP |
+| **Sipariş sistemi (cezasız)** | Müşteri bir içecek ister; oyuncu hazırlar. Sipariş **alınmazsa müşteri ceza vermeden geri döner** — hiçbir kayıp/ceza yok, sadece o satışın ödülü kazanılmaz. | MVP |
+| **Müşteri & sıra (queue)** | Müşteriler gelir, sıraya girer, sipariş verir. **Sabır/ceza göstergesi yok**; beklerse bir süre sonra sadece sessizce ayrılır. | MVP |
+| **XP & İtibar** | Sipariş tamamlanınca **XP + para** kazanılır. XP bir itibar göstergesidir: **yüksek XP daha çok müşteri çeker**, düşük XP müşteriyi azaltır. XP yumuşak çalışır, asla "kaybetme" sebebi değildir. | MVP |
+| **Para & ekonomi (cezasız)** | Sipariş tamamlama → para. Para **upgrade ve ücretli malzeme** almak için harcanır. **Para asla sıfırlanmaz / eksiye düşmez** — yetersizse sadece o şeyi alamazsın. | MVP |
+| **Ücretsiz & ücretli ürünler** | Bazı temel malzemeler **her zaman ücretsiz ve sınırsızdır** (örn. basic kahve, su) → oyun sonsuza dek oynanabilsin. Geri kalan/premium malzemeler para ile alınır. | MVP |
+| **Upgrade / satın alma** | Ekipman, mobilya, dekor, mekan. Görünür kurulum. Para ile alınır. | MVP+1 |
+| **Tuvalet temizliği** | Oyunda tuvaletler var. Temizlik **basittir: sifon çekme + paspas**. Kirli kalırsa **XP düşer** (kirli tuvalet = eksi XP). Ceza değil, itibar etkisi. | MVP+1 |
+| **Şemsiyeler & gölge** | Açılan şemsiyeler gölge yaratır; gölge oluşturan açık şemsiye **XP artırır** (cozy atmosfer ödülü). | MVP+1 |
+| **Stok yönetimi** | Ücretli malzemeler tükenir; para ile yeniden alınır. Ücretsiz temeller tükenmez. | MVP+1 |
+| **Müzik & ambiyans** | Oyunda sürekli **müzik çalar**; cozy atmosferin ayrılmaz parçası. | MVP+1 |
 | **Personel (NPC barista/kasiyer)** | İşe alınır, görev atanır, maaş öder. | Sonraki |
-| **Memnuniyet / itibar** | Hız & kalite → puan → daha çok müşteri & fiyat toleransı. | Sonraki |
-| **Gün/zaman & yoğunluk dalgaları** | Sabah/öğle yoğunluğu gibi ritim. | Sonraki |
+| **Gün/zaman ritmi (cezasız)** | Yoğunluk dalgaları olabilir ama **zaman sınırı/gün sonu cezası yok**; sadece atmosferik ritim. | Sonraki |
 
 > **Kapsam kuralı:** Önce MVP işaretli mekanikler eksiksiz ve eğlenceli çalışmalı. "MVP+1" ve "Sonraki" yalnızca MVP sağlam olduğunda ele alınır. Yeni mekanik önermeden önce mevcut MVP'nin tamam olup olmadığını kontrol et.
 
 ### 1.6 Ekonomi Tasarım Hedefleri (denge için pusula)
-- Oyuncu her günün sonunda küçük ama anlamlı bir ilerleme hissetmeli.
-- İlk büyük upgrade ~2-3 gün içinde erişilebilir olmalı (erken ödül).
-- Para enflasyonu yok: ileri seviye upgrade'ler ileri seviye giderleri (kira, maaş, stok) gerektirsin.
+- Oyuncu sürekli küçük ama anlamlı bir ilerleme hissetmeli — ilerleme **tek yönlüdür** (hep ileri).
+- İlk büyük upgrade erken erişilebilir olmalı (erken ödül).
+- **Para asla sıfırlanmaz, eksiye düşmez, ceza olarak alınmaz.** Sadece harcanır (upgrade + ücretli malzeme).
+- **Ücretsiz temel malzemeler** (basic kahve, su vb.) sayesinde oyuncu parasız kalsa bile oynamaya devam edip tekrar para kazanabilir. Bu, "oyun sonsuza dek dönebilir" kuralının ekonomik garantisidir.
+- XP ile para ayrı eksenlerdir: **XP = itibar/müşteri akışı**, **para = satın alma gücü**. Biri diğerinin yerine geçmez.
 - *(Gerçek sayılar `Config` veya bir DataTable'da tutulur — bu dosyada sabit sayı tutma, sadece hedef.)*
 
 ### 1.7 Oyuncu Deneyimi Yol Haritası (kabaca)
@@ -143,10 +151,15 @@ Bu sıra, oynanabilir bir dikey dilim (vertical slice) hedefler:
 ## BÖLÜM 3 — AÇIK SORULAR / KARAR BEKLEYENLER
 *(AI veya tasarımcı buraya kararsız konuları yazar; çözülünce ilgili bölüme taşınır.)*
 
+- [x] **Tür/ton:** Cozy. Zaman sınırı yok, challenge yok, ceza yok. → Bkz. 1.2 cozy çekirdek kuralı.
+- [x] **XP'nin işlevi:** İtibar göstergesi; yüksek XP daha çok müşteri çeker. → Bkz. 1.5 "XP & İtibar".
 - [ ] Sanatsal stil net mi? (gerçekçi / stilize / low-poly) — paket stiline bak.
-- [ ] Hedef oturum uzunluğu (1 gün = kaç dakika gerçek zaman)?
-- [ ] Personel sistemi MVP+1 mi yoksa daha sonra mı?
-- [ ] Kayıt/yükleme (save) MVP'ye dahil mi?
+- [ ] Hangi malzemeler tam olarak **ücretsiz** olacak? (kesin liste: basic kahve + su onaylı; süt/şurup/buz ücretli mi?)
+- [ ] XP eşik değerleri & itibarın müşteri sayısına etkisi hangi formülle? (sayılar DataTable'da)
+- [ ] Tuvalet "kirlenme" hangi tetikle artar (zamanla mı, müşteri kullanımıyla mı)? Eksi XP miktarı?
+- [ ] Şemsiye gölge XP ödülü tek seferlik mi, sürekli mi?
+- [ ] Personel sistemi ne zaman? (şu an "Sonraki")
+- [ ] Kayıt/yükleme (save) MVP'ye dahil mi? (sonsuz oynanış için muhtemelen gerekli)
 
 ---
-*Son güncelleme: 2026-06-05 — kuruluş. Bu dosya değiştikçe tarih ve ilgili bölümü güncelleyin.*
+*Son güncelleme: 2026-06-07 — cozy çekirdek kararları (ceza yok / sıfırlama yok), XP=itibar sistemi, ücretsiz/ücretli malzeme, tuvalet temizliği, şemsiye-gölge XP, içecek istasyonları (süt/kahve/su/şurup/buz/sıcak su/soğuk su), müzik. Bu dosya değiştikçe tarih ve ilgili bölümü güncelleyin.*
