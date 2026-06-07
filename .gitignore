@@ -1,0 +1,17 @@
+# Unreal Engine generated folders
+Binaries/
+DerivedDataCache/
+Intermediate/
+Saved/
+.vs/
+
+# Build artifacts
+*.VC.db
+*.opensdf
+*.opendb
+*.sdf
+*.suo
+*.xcodeproj
+*.xcworkspace
+
+# Generated project files (kept .uproject and .sln out of ignore)
