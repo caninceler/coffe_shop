@@ -5,7 +5,7 @@
 	"Description": "",
 	"Modules": [
 		{
-			"Name": "kahveci01",
+			"Name": "CoffeeShop",
 			"Type": "Runtime",
 			"LoadingPhase": "Default"
 		}

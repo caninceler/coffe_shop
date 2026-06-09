@@ -10,6 +10,6 @@ public class kahveci01EditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.V6;
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_7;
-		ExtraModuleNames.Add("kahveci01");
+		ExtraModuleNames.Add("CoffeeShop");
 	}
 }
