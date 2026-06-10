@@ -9,7 +9,7 @@
 
 namespace
 {
-ACoffeeShopCustomerServicePoint* ResolveCustomerServicePoint(UBehaviorTreeComponent& OwnerComp, UBlackboardComponent& BlackboardComponent)
+ACoffeeShopCustomerServicePoint* ResolvePickupCustomerServicePoint(UBehaviorTreeComponent& OwnerComp, UBlackboardComponent& BlackboardComponent)
 {
 	ACoffeeShopCustomerServicePoint* ServicePoint = Cast<ACoffeeShopCustomerServicePoint>(
 		BlackboardComponent.GetValueAsObject(ACoffeeShopCustomerAIController::KeyServicePoint));
@@ -62,7 +62,7 @@ EBTNodeResult::Type UCoffeeShopBTTask_SetTargetLocationFromPickupPoint::ExecuteT
 		return EBTNodeResult::Failed;
 	}
 
-	ACoffeeShopCustomerServicePoint* ServicePoint = ResolveCustomerServicePoint(OwnerComp, *BlackboardComponent);
+	ACoffeeShopCustomerServicePoint* ServicePoint = ResolvePickupCustomerServicePoint(OwnerComp, *BlackboardComponent);
 	if (!ServicePoint)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SetTargetLocationFromPickupPoint failed: ServicePoint is null."));

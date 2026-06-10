@@ -100,6 +100,17 @@ bool ACoffeeShopCustomerServicePoint::AcceptNextPayment()
 	}
 
 	ACoffeeShopCustomerCharacter* Customer = PaymentQueue[0];
+
+	// Müşteri henüz kasaya yürüyor olabilir; ödeme noktasının önüne ulaşmadan
+	// siparişi alma. Sadece yeterince yaklaştığında "Take Order" işler.
+	if (IsValid(Customer) && !HasCustomerReachedCounter(Customer))
+	{
+		UE_LOG(LogTemp, Display, TEXT("AcceptNextPayment blocked on %s: %s has not reached the counter yet."),
+			*GetNameSafe(this),
+			*GetNameSafe(Customer));
+		return false;
+	}
+
 	PaymentQueue.RemoveAt(0);
 	ActivePickupCustomer = Customer;
 	Customer->AcceptPayment();
@@ -113,6 +124,36 @@ bool ACoffeeShopCustomerServicePoint::AcceptNextPayment()
 		*GetNameSafe(this),
 		PaymentQueue.Num());
 	return true;
+}
+
+ACoffeeShopCustomerCharacter* ACoffeeShopCustomerServicePoint::GetNextPaymentCustomer() const
+{
+	for (const TObjectPtr<ACoffeeShopCustomerCharacter>& Customer : PaymentQueue)
+	{
+		if (IsValid(Customer))
+		{
+			return Customer;
+		}
+	}
+
+	return nullptr;
+}
+
+bool ACoffeeShopCustomerServicePoint::IsNextPaymentCustomerAtCounter() const
+{
+	const ACoffeeShopCustomerCharacter* Customer = GetNextPaymentCustomer();
+	return Customer != nullptr && HasCustomerReachedCounter(Customer);
+}
+
+bool ACoffeeShopCustomerServicePoint::HasCustomerReachedCounter(const ACoffeeShopCustomerCharacter* Customer) const
+{
+	if (!IsValid(Customer))
+	{
+		return false;
+	}
+
+	const float DistanceToPayment = FVector::Dist(Customer->GetActorLocation(), GetPaymentTransform().GetLocation());
+	return DistanceToPayment <= PaymentReachDistance;
 }
 
 void ACoffeeShopCustomerServicePoint::RegisterWaitingForDrink(ACoffeeShopCustomerCharacter* Customer)

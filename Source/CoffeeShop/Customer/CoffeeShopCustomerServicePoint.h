@@ -38,6 +38,16 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Customer Service")
 	bool AcceptNextPayment();
 
+	// Sıradaki (ödeme bekleyen) müşteri; kuyruk boşsa null. Onay ekranı bununla
+	// müşteriyi ve siparişini gösterir.
+	UFUNCTION(BlueprintPure, Category = "Customer Service|Queue")
+	ACoffeeShopCustomerCharacter* GetNextPaymentCustomer() const;
+
+	// Sıradaki müşteri ödeme noktasının önüne ulaştı mı? Onay ekranı açılmadan önce
+	// kontrol edilir; AcceptNextPayment ile aynı mesafe mantığını paylaşır.
+	UFUNCTION(BlueprintPure, Category = "Customer Service|Queue")
+	bool IsNextPaymentCustomerAtCounter() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Customer Service")
 	void RegisterWaitingForDrink(ACoffeeShopCustomerCharacter* Customer);
 
@@ -81,6 +91,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customer Service|Queue", meta = (ClampMin = "1", UIMin = "1"))
 	int32 MaxCustomersInServiceFlow = 6;
 
+	// Müşteri ödeme noktasına bu mesafeden daha yakın değilse "Take Order" (E) çalışmaz.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customer Service|Queue", meta = (ClampMin = "10.0", UIMin = "10.0"))
+	float PaymentReachDistance = 150.0f;
+
 	void CompactQueues();
 	void RefreshPaymentQueuePositions();
+
+	// Verilen müşteri ödeme noktasına yeterince yakın mı (PaymentReachDistance içinde)?
+	bool HasCustomerReachedCounter(const ACoffeeShopCustomerCharacter* Customer) const;
 };
