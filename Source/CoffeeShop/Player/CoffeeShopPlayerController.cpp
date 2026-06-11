@@ -8,6 +8,7 @@
 #include "Interaction/CoffeeShopInteractable.h"
 #include "UI/CoffeeShopOrderConfirmWidget.h"
 #include "Blueprint/UserWidget.h"
+#include "Engine/Engine.h"
 
 ACoffeeShopPlayerController::ACoffeeShopPlayerController()
 {
@@ -170,6 +171,28 @@ void ACoffeeShopPlayerController::SetCarriedProductId(FName ProductId)
 {
 	CarriedProductId = ProductId;
 	UE_LOG(LogTemp, Display, TEXT("Carried product set to '%s'."), *ProductId.ToString());
+
+	// Ekranda elindeki ürünü göster (kalıcı satır; her değişimde güncellenir).
+	if (GEngine)
+	{
+		FString CarriedText;
+		FCoffeeShopFurnitureRow Row;
+		if (ProductId.IsNone())
+		{
+			CarriedText = TEXT("Elin boş");
+		}
+		else if (GetFurnitureRow(ProductId, Row))
+		{
+			CarriedText = FString::Printf(TEXT("Elinde: %s  [şekil: %d]"),
+				*Row.DisplayName.ToString(), static_cast<int32>(Row.Shape));
+		}
+		else
+		{
+			CarriedText = FString::Printf(TEXT("Elinde: %s (tablo satırı yok!)"), *ProductId.ToString());
+		}
+		// Sabit anahtar (1) → satır güncellenir, üst üste yığılmaz.
+		GEngine->AddOnScreenDebugMessage(1, 5.0f, FColor::Yellow, CarriedText);
+	}
 }
 
 void ACoffeeShopPlayerController::ConsumeCarriedFurniture()

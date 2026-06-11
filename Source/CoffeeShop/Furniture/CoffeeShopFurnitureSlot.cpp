@@ -5,6 +5,7 @@
 #include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Pawn.h"
+#include "Engine/Engine.h"
 
 ACoffeeShopFurnitureSlot::ACoffeeShopFurnitureSlot()
 {
@@ -24,6 +25,14 @@ ACoffeeShopFurnitureSlot::ACoffeeShopFurnitureSlot()
 void ACoffeeShopFurnitureSlot::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Boş dükkan: başta bu slota bağlı mevcut model gizli + çarpışmasız.
+	if (IsValid(TargetModel))
+	{
+		TargetModel->SetActorHiddenInGame(true);
+		TargetModel->SetActorEnableCollision(false);
+	}
+
 	UpdatePlaceholderVisual();
 }
 
@@ -74,34 +83,32 @@ void ACoffeeShopFurnitureSlot::Interact_Implementation(AActor* Interactor)
 	{
 		UE_LOG(LogTemp, Display, TEXT("Slot %s rejects shape %d (accepts %d)."),
 			*GetNameSafe(this), static_cast<int32>(Row.Shape), static_cast<int32>(AcceptedShape));
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(2, 3.0f, FColor::Red,
+				FString::Printf(TEXT("Slot bu sekli kabul etmiyor (eldeki: %d, slot: %d)"),
+					static_cast<int32>(Row.Shape), static_cast<int32>(AcceptedShape)));
+		}
 		return;
 	}
 
-	// Ürünün BP'sini yükle ve slotun transform'una snap'le.
-	UClass* FurnitureClass = Row.FurnitureClass.LoadSynchronous();
-	if (!FurnitureClass)
+	// Yerleştir: sahnede zaten duran bağlı modeli görünür + çarpışmalı yap (spawn yok).
+	if (!IsValid(TargetModel))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Slot %s: product '%s' has no furniture class."),
-			*GetNameSafe(this), *CarriedProductId.ToString());
+		UE_LOG(LogTemp, Warning, TEXT("Slot %s: TargetModel not set; nothing to reveal."), *GetNameSafe(this));
 		return;
 	}
 
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AActor* Furniture = GetWorld()->SpawnActor<AActor>(FurnitureClass, GetActorTransform(), SpawnParameters);
-	if (!Furniture)
-	{
-		return;
-	}
+	TargetModel->SetActorHiddenInGame(false);
+	TargetModel->SetActorEnableCollision(true);
 
-	PlacedFurniture = Furniture;
 	bOccupied = true;
 	UpdatePlaceholderVisual();
 
 	PlayerController->ConsumeCarriedFurniture();
 
-	UE_LOG(LogTemp, Display, TEXT("Slot %s: placed %s (product '%s')."),
-		*GetNameSafe(this), *GetNameSafe(Furniture), *CarriedProductId.ToString());
+	UE_LOG(LogTemp, Display, TEXT("Slot %s: revealed %s (product '%s')."),
+		*GetNameSafe(this), *GetNameSafe(TargetModel), *CarriedProductId.ToString());
 }
 
 FText ACoffeeShopFurnitureSlot::GetInteractionPrompt_Implementation() const

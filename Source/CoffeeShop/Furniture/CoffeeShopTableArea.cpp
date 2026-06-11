@@ -18,6 +18,14 @@ ACoffeeShopTableArea::ACoffeeShopTableArea()
 void ACoffeeShopTableArea::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// Teşhis: referanslar doğru bağlanmış mı?
+	UE_LOG(LogTemp, Warning, TEXT("TableArea %s: TableSlot=%s, ChairSlots=%d, SeatPoints=%d"),
+		*GetNameSafe(this),
+		*GetNameSafe(TableSlot),
+		ChairSlots.Num(),
+		SeatPoints.Num());
+
 	RefreshSeats();
 }
 
@@ -52,6 +60,9 @@ void ACoffeeShopTableArea::RefreshSeats()
 		if (Seat->IsSeatActive() != bShouldBeActive)
 		{
 			Seat->SetSeatActive(bShouldBeActive);
+			UE_LOG(LogTemp, Warning, TEXT("TableArea %s: seat %s set active=%d (tablePlaced=%d, chairPlaced=%d)"),
+				*GetNameSafe(this), *GetNameSafe(Seat), bShouldBeActive ? 1 : 0,
+				bTablePlaced ? 1 : 0, bChairPlaced ? 1 : 0);
 		}
 	}
 }

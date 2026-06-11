@@ -53,6 +53,8 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Furniture Slot")
 	bool bOccupied = false;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Furniture Slot")
-	TObjectPtr<AActor> PlacedFurniture;
+	// Bu slota karşılık gelen, sahnede ZATEN duran mobilya aktörü. Editörde bağlanır.
+	// Başta gizlenir (boş dükkan); oyuncu uygun ürünü yerleştirince görünür yapılır.
+	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Furniture Slot")
+	TObjectPtr<AActor> TargetModel;
 };

@@ -2,7 +2,6 @@
 
 #include "UI/CoffeeShopOrderConfirmWidget.h"
 #include "Customer/CoffeeShopCustomerCharacter.h"
-#include "Customer/CoffeeShopCustomerSeat.h"
 #include "Customer/CoffeeShopCustomerServicePoint.h"
 #include "Player/CoffeeShopPlayerController.h"
 
@@ -17,8 +16,6 @@ void UCoffeeShopOrderConfirmWidget::Setup(ACoffeeShopPlayerController* InOwningC
 
 	// WBP görselleri sipariş verisine göre güncellesin.
 	OnOrderReady();
-	// Masa butonları açılışta doğru durumu göstersin.
-	OnTableGroupsChanged();
 }
 
 void UCoffeeShopOrderConfirmWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -61,26 +58,6 @@ void UCoffeeShopOrderConfirmWidget::ConfirmOrder()
 bool UCoffeeShopOrderConfirmWidget::HasCustomer() const
 {
 	return IsValid(Customer);
-}
-
-void UCoffeeShopOrderConfirmWidget::ToggleTableGroup(int32 GroupId)
-{
-	const bool bCurrentlyActive = ACoffeeShopCustomerSeat::IsSeatGroupActive(this, GroupId);
-	// SetSeatGroupActive, oturan müşteri varken kapatmayı reddeder (false döner).
-	ACoffeeShopCustomerSeat::SetSeatGroupActive(this, GroupId, !bCurrentlyActive);
-
-	// WBP butonları yeni duruma göre güncellesin.
-	OnTableGroupsChanged();
-}
-
-bool UCoffeeShopOrderConfirmWidget::IsTableGroupActive(int32 GroupId) const
-{
-	return ACoffeeShopCustomerSeat::IsSeatGroupActive(this, GroupId);
-}
-
-bool UCoffeeShopOrderConfirmWidget::IsTableGroupOccupied(int32 GroupId) const
-{
-	return ACoffeeShopCustomerSeat::IsSeatGroupOccupied(this, GroupId);
 }
 
 void UCoffeeShopOrderConfirmWidget::CloseOrder()
