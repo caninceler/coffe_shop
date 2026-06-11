@@ -33,6 +33,7 @@ public:
 	static const FName KeySeat;
 	static const FName KeyTargetActor;
 	static const FName KeyTargetLocation;
+	static const FName KeyTakeAway;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Customer AI")

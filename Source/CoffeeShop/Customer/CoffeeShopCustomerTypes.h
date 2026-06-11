@@ -17,6 +17,7 @@ enum class ECoffeeShopCustomerVisitState : uint8
 	WalkingToSeat UMETA(DisplayName = "Walking To Seat"),
 	Seated UMETA(DisplayName = "Seated"),
 	Leaving UMETA(DisplayName = "Leaving"),
+	TakingAway UMETA(DisplayName = "Taking Away"),
 	Angry UMETA(DisplayName = "Angry")
 };
 

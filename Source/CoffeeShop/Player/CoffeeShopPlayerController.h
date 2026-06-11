@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Furniture/CoffeeShopFurnitureTypes.h"
 #include "CoffeeShopPlayerController.generated.h"
 
 class ACoffeeShopCustomerServicePoint;
 class UCoffeeShopOrderConfirmWidget;
+class UDataTable;
 
 UCLASS()
 class COFFEESHOP_API ACoffeeShopPlayerController : public APlayerController
@@ -32,6 +34,32 @@ public:
 	// Onay ekranı kapanırken oyunu Game input moduna döndürür, imleci gizler.
 	UFUNCTION(BlueprintCallable, Category = "Order Confirm")
 	void CloseOrderConfirm();
+
+	// --- Mobilya taşıma/yerleştirme ---
+
+	// Oyuncunun elinde taşıdığı ürünün ID'si (NAME_None = boş).
+	UFUNCTION(BlueprintPure, Category = "Furniture")
+	FName GetCarriedProductId() const { return CarriedProductId; }
+
+	// Elde mobilya var mı?
+	UFUNCTION(BlueprintPure, Category = "Furniture")
+	bool IsCarryingFurniture() const { return !CarriedProductId.IsNone(); }
+
+	// Taşınan ürünün şekli (slot uyumu için). Ürün yoksa None.
+	UFUNCTION(BlueprintPure, Category = "Furniture")
+	ECoffeeShopFurnitureShape GetCarriedShape() const;
+
+	// Oyuncuya bir ürün ID'si ver (kutudan alınca / test tuşuyla).
+	UFUNCTION(BlueprintCallable, Category = "Furniture")
+	void SetCarriedProductId(FName ProductId);
+
+	// Taşınan ürünü "tüket" (slota yerleştirilince) → elini boşaltır.
+	UFUNCTION(BlueprintCallable, Category = "Furniture")
+	void ConsumeCarriedFurniture();
+
+	// Bir ürün ID'sinin DataTable satırını döndürür (slot, spawn için kullanır).
+	// Bulunamazsa false.
+	bool GetFurnitureRow(FName ProductId, FCoffeeShopFurnitureRow& OutRow) const;
 
 protected:
 	virtual void SetupInputComponent() override;
@@ -65,4 +93,16 @@ protected:
 	// Onay ekranı açılmadan önceki kamera hedefi; kapanınca buna geri dönülür.
 	UPROPERTY()
 	TObjectPtr<AActor> PreviousViewTarget;
+
+	// Oyuncunun elinde taşıdığı ürünün ID'si (DataTable RowName).
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Furniture")
+	FName CarriedProductId = NAME_None;
+
+	// Tüm mobilya ürünlerini tanımlayan DataTable (satır tipi: FCoffeeShopFurnitureRow).
+	// Editörde (BP_PlayerController) atanır.
+	UPROPERTY(EditDefaultsOnly, Category = "Furniture")
+	TObjectPtr<UDataTable> FurnitureDataTable;
+
+	// TEST için: bu tuş DataTable'daki ürünleri sırayla eline alır (Parça 2'de kutu gelince kalkar).
+	void CycleCarriedFurnitureForTest();
 };

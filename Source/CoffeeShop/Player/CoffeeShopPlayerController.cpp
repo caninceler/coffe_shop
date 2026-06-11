@@ -2,6 +2,7 @@
 
 #include "Player/CoffeeShopPlayerController.h"
 #include "Components/PrimitiveComponent.h"
+#include "InputCoreTypes.h"
 #include "Customer/CoffeeShopCustomerCharacter.h"
 #include "Customer/CoffeeShopCustomerServicePoint.h"
 #include "Interaction/CoffeeShopInteractable.h"
@@ -30,6 +31,8 @@ void ACoffeeShopPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction(TEXT("Interact"), IE_Pressed, this, &ACoffeeShopPlayerController::Interact);
 	InputComponent->BindAction(TEXT("Interact_Debug"), IE_Pressed, this, &ACoffeeShopPlayerController::Interact);
+	// TEST: F tuşu eldeki mobilya türünü döngüyle değiştirir (Parça 1 testi için).
+	InputComponent->BindKey(EKeys::F, IE_Pressed, this, &ACoffeeShopPlayerController::CycleCarriedFurnitureForTest);
 	UE_LOG(LogTemp, Display, TEXT("CoffeeShop player controller input bindings installed."));
 }
 
@@ -124,17 +127,12 @@ void ACoffeeShopPlayerController::OpenOrderConfirm(ACoffeeShopCustomerServicePoi
 		return;
 	}
 
-	// Sıradaki müşteri kasaya ulaşmadıysa ekran açılmaz (mevcut mesafe davranışıyla tutarlı).
-	if (!ServicePoint->IsNextPaymentCustomerAtCounter())
+	// Ekran müşteri olmasa da açılır (yönetim paneli). Müşteri sadece kasaya ULAŞMIŞSA
+	// sol panelde siparişi gösterilir; ulaşmamış/yoksa müşteri null geçilir, sol panel boş kalır.
+	ACoffeeShopCustomerCharacter* Customer = nullptr;
+	if (ServicePoint->IsNextPaymentCustomerAtCounter())
 	{
-		UE_LOG(LogTemp, Display, TEXT("OpenOrderConfirm: next customer has not reached the counter at %s."), *GetNameSafe(ServicePoint));
-		return;
-	}
-
-	ACoffeeShopCustomerCharacter* Customer = ServicePoint->GetNextPaymentCustomer();
-	if (!IsValid(Customer))
-	{
-		return;
+		Customer = ServicePoint->GetNextPaymentCustomer();
 	}
 
 	if (!OrderConfirmWidgetClass)
@@ -166,6 +164,72 @@ void ACoffeeShopPlayerController::OpenOrderConfirm(ACoffeeShopCustomerServicePoi
 	InputMode.SetWidgetToFocus(ActiveOrderConfirmWidget->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	SetInputMode(InputMode);
+}
+
+void ACoffeeShopPlayerController::SetCarriedProductId(FName ProductId)
+{
+	CarriedProductId = ProductId;
+	UE_LOG(LogTemp, Display, TEXT("Carried product set to '%s'."), *ProductId.ToString());
+}
+
+void ACoffeeShopPlayerController::ConsumeCarriedFurniture()
+{
+	CarriedProductId = NAME_None;
+}
+
+ECoffeeShopFurnitureShape ACoffeeShopPlayerController::GetCarriedShape() const
+{
+	FCoffeeShopFurnitureRow Row;
+	if (GetFurnitureRow(CarriedProductId, Row))
+	{
+		return Row.Shape;
+	}
+	return ECoffeeShopFurnitureShape::None;
+}
+
+bool ACoffeeShopPlayerController::GetFurnitureRow(FName ProductId, FCoffeeShopFurnitureRow& OutRow) const
+{
+	if (!FurnitureDataTable || ProductId.IsNone())
+	{
+		return false;
+	}
+
+	const FCoffeeShopFurnitureRow* Found = FurnitureDataTable->FindRow<FCoffeeShopFurnitureRow>(ProductId, TEXT("GetFurnitureRow"));
+	if (!Found)
+	{
+		return false;
+	}
+
+	OutRow = *Found;
+	return true;
+}
+
+void ACoffeeShopPlayerController::CycleCarriedFurnitureForTest()
+{
+	// TEST: DataTable'daki ürünleri sırayla eline al (sonra NAME_None → boş).
+	if (!FurnitureDataTable)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("CycleCarriedFurnitureForTest: FurnitureDataTable not set."));
+		return;
+	}
+
+	TArray<FName> RowNames = FurnitureDataTable->GetRowNames();
+	if (RowNames.Num() == 0)
+	{
+		return;
+	}
+
+	const int32 CurrentIndex = RowNames.IndexOfByKey(CarriedProductId);
+	const int32 NextIndex = CurrentIndex + 1; // -1 (bulunamadı/None) → 0
+	if (RowNames.IsValidIndex(NextIndex))
+	{
+		SetCarriedProductId(RowNames[NextIndex]);
+	}
+	else
+	{
+		// Son üründen sonra eli boşalt.
+		SetCarriedProductId(NAME_None);
+	}
 }
 
 void ACoffeeShopPlayerController::CloseOrderConfirm()

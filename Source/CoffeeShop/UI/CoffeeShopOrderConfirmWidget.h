@@ -29,12 +29,41 @@ public:
 		ACoffeeShopCustomerCharacter* InCustomer);
 
 	// "ONAYLA" butonu: ödemeyi kabul eder (müşteri pickup'a yürür) ve ekranı kapatır.
+	// Müşteri yoksa hiçbir şey yapmaz.
 	UFUNCTION(BlueprintCallable, Category = "Order Confirm")
 	void ConfirmOrder();
 
 	// "KAPAT" butonu: hiçbir şey yapmadan ekranı kapatır; müşteri kasada bekler.
 	UFUNCTION(BlueprintCallable, Category = "Order Confirm")
 	void CloseOrder();
+
+	// Sol panel için: gösterilecek bir müşteri/sipariş var mı?
+	UFUNCTION(BlueprintPure, Category = "Order Confirm")
+	bool HasCustomer() const;
+
+	// Ekran açıkken müşteri durumunu yeniden kontrol eder. Sıradaki müşteri değiştiyse
+	// (sonradan geldi/gitti) Customer + Order güncellenir ve OnOrderReady tetiklenir,
+	// böylece WBP "Müşteri yok" → sipariş arasında canlı geçiş yapar.
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+
+	// --- Sağ panel: Masa/sandalye yönetimi ---
+
+	// Bir masa grubunu aç/kapa (toggle). WBP'deki 7 butondan biri çağırır (GroupId 0..6).
+	UFUNCTION(BlueprintCallable, Category = "Table Management")
+	void ToggleTableGroup(int32 GroupId);
+
+	// Bir masa grubu şu an aktif mi? Buton görünümünü (Açık/Kapalı) güncellemek için.
+	UFUNCTION(BlueprintPure, Category = "Table Management")
+	bool IsTableGroupActive(int32 GroupId) const;
+
+	// Grupta oturan müşteri var mı? (Doluysa kapatılamaz — buton kilitli gösterilebilir.)
+	UFUNCTION(BlueprintPure, Category = "Table Management")
+	bool IsTableGroupOccupied(int32 GroupId) const;
+
+	// WBP'nin masa butonlarını (Açık/Kapalı/Dolu) güncellemesi için event. Toggle
+	// sonrası ve ekran açılışında çağrılır.
+	UFUNCTION(BlueprintImplementableEvent, Category = "Table Management")
+	void OnTableGroupsChanged();
 
 protected:
 	// Bağlı müşteri (sıradaki ödeme bekleyen).

@@ -72,6 +72,9 @@ ACoffeeShopCustomerCharacter* ACoffeeShopCustomerSpawnPoint::SpawnCustomer()
 		// İlk versiyon: her müşteri "Americano" ister. (Sonra rastgele menü seçimine çevrilebilir.)
 		Customer->OrderRequest.DrinkId = TEXT("Americano");
 		Customer->OrderRequest.DisplayName = FText::FromString(TEXT("Americano"));
+		// Çoğu müşteri oturmak ister (SitDownChance); azı take away. Oturmak isteyen
+		// boş masa bulamazsa karar düğümünde yine take away'e döner.
+		Customer->SetWantsToSitDown(FMath::FRand() < SitDownChance);
 		Customer->SetVisitState(ECoffeeShopCustomerVisitState::Entering);
 		UE_LOG(LogTemp, Display, TEXT("Spawned customer %s with ServicePoint %s."), *GetNameSafe(Customer), *GetNameSafe(ServicePoint));
 	}

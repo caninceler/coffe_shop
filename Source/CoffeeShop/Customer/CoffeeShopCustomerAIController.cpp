@@ -13,6 +13,7 @@ const FName ACoffeeShopCustomerAIController::KeyServicePoint(TEXT("ServicePoint"
 const FName ACoffeeShopCustomerAIController::KeySeat(TEXT("Seat"));
 const FName ACoffeeShopCustomerAIController::KeyTargetActor(TEXT("TargetActor"));
 const FName ACoffeeShopCustomerAIController::KeyTargetLocation(TEXT("TargetLocation"));
+const FName ACoffeeShopCustomerAIController::KeyTakeAway(TEXT("TakeAway"));
 
 ACoffeeShopCustomerAIController::ACoffeeShopCustomerAIController()
 {

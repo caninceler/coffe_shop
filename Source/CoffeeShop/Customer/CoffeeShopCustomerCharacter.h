@@ -58,6 +58,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Customer")
 	void StartAngryExit();
 
+	// Müşteri oturmak mı istiyor (true), yoksa take away mı (false)? Spawn'da rastgele
+	// belirlenir; oturmak isteyen boş masa bulamazsa yine take away'e döner.
+	UFUNCTION(BlueprintCallable, Category = "Customer")
+	void SetWantsToSitDown(bool bValue);
+
+	UFUNCTION(BlueprintPure, Category = "Customer")
+	bool WantsToSitDown() const;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<UBehaviorTree> BehaviorTreeAsset;
 
@@ -79,6 +87,9 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Customer")
 	bool bPaymentAccepted = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Customer")
+	bool bWantsToSitDown = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customer", meta = (ClampMin = "0.1", UIMin = "0.1"))
 	float AngryDurationSeconds = 2.0f;

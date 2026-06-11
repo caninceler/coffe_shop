@@ -42,6 +42,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customer Spawn|Auto Spawn", meta = (ClampMin = "0.1", UIMin = "0.1"))
 	float MaxAutoSpawnDelay = 15.0f;
 
+	// Müşterinin oturmak isteme olasılığı (0..1). Geri kalanı take away ister.
+	// Oturmak isteyen boş masa bulamazsa yine take away'e döner.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Customer Spawn", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float SitDownChance = 0.75f;
+
 private:
 	void SpawnCustomerAndScheduleNext();
 	void ScheduleNextAutoSpawn();

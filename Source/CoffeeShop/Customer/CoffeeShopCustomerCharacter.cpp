@@ -154,3 +154,13 @@ bool ACoffeeShopCustomerCharacter::IsOrderServed() const
 {
 	return bOrderServed;
 }
+
+void ACoffeeShopCustomerCharacter::SetWantsToSitDown(bool bValue)
+{
+	bWantsToSitDown = bValue;
+}
+
+bool ACoffeeShopCustomerCharacter::WantsToSitDown() const
+{
+	return bWantsToSitDown;
+}
