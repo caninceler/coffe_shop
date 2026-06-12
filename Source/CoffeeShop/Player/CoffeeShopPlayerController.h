@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Furniture/CoffeeShopFurnitureTypes.h"
+#include "Customer/CoffeeShopRecipeTypes.h"
 #include "CoffeeShopPlayerController.generated.h"
 
 class ACoffeeShopCustomerServicePoint;
@@ -61,6 +62,36 @@ public:
 	// Bulunamazsa false.
 	bool GetFurnitureRow(FName ProductId, FCoffeeShopFurnitureRow& OutRow) const;
 
+	// --- Kahve hazırlama (tarif tabanlı) ---
+
+	// Bir istasyon adımını dene. Tarifte sıradaki adım buysa ilerler (true); değilse uyarı (false).
+	// İlk adım (GrabCup) yeni bir tarif başlatır (sıradaki müşterinin içeceği).
+	UFUNCTION(BlueprintCallable, Category = "Coffee")
+	bool TryPrepStep(ECoffeeStep Step);
+
+	// Elde hazır kahve var mı? (Aktif tarifin tüm adımları bitti mi.)
+	UFUNCTION(BlueprintPure, Category = "Coffee")
+	bool IsDrinkReady() const;
+
+	// Bir hazırlama süreci aktif mi (bardak alındı, henüz bitmedi/teslim edilmedi)?
+	UFUNCTION(BlueprintPure, Category = "Coffee")
+	bool IsPreparingDrink() const { return !ActiveDrinkId.IsNone(); }
+
+	// Hazırlanan içeceğin ID'si (doğruluk kontrolü için; şimdilik pasif).
+	UFUNCTION(BlueprintPure, Category = "Coffee")
+	FName GetReadyDrinkId() const { return ActiveDrinkId; }
+
+	// Hazırlamayı sıfırla (servis edilince ya da iptal) — eldeki bardağı yok eder.
+	UFUNCTION(BlueprintCallable, Category = "Coffee")
+	void ResetPreparation();
+
+	// Hazır bardağı teslim noktasına bırak: bardak elden çıkar, verilen transform'a
+	// snap'lenir ve görünür kalır; PickupCounter NPC alınca onu yok eder. Hazırlama
+	// durumu sıfırlanır (ActiveDrinkId temizlenir) ama bardak aktörü sahnede DURUR.
+	// Bırakılan bardak aktörünü döndürür (PickupCounter sonra Destroy eder), yoksa null.
+	UFUNCTION(BlueprintCallable, Category = "Coffee")
+	AActor* PlaceCupAt(const FTransform& DropTransform);
+
 protected:
 	virtual void SetupInputComponent() override;
 
@@ -105,4 +136,36 @@ protected:
 
 	// TEST için: bu tuş DataTable'daki ürünleri sırayla eline alır (Parça 2'de kutu gelince kalkar).
 	void CycleCarriedFurnitureForTest();
+
+	// --- Kahve hazırlama state'i ---
+
+	// Tüm içecek tariflerini tanımlayan DataTable (satır tipi: FCoffeeRecipeRow). Editörde atanır.
+	UPROPERTY(EditDefaultsOnly, Category = "Coffee")
+	TObjectPtr<UDataTable> RecipesDataTable;
+
+	// Hazır olunca oyuncunun eline takılacak bardak mesh aktörü (BP_Mug). Editörde atanır.
+	UPROPERTY(EditDefaultsOnly, Category = "Coffee")
+	TSubclassOf<AActor> CupMeshClass;
+
+	// Şu an hazırlanan içeceğin ID'si (NAME_None = hazırlık yok).
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Coffee")
+	FName ActiveDrinkId = NAME_None;
+
+	// Aktif tarifte kaçıncı adımdayız (0 = henüz adım yapılmadı).
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Coffee")
+	int32 CurrentStepIndex = 0;
+
+	// Aktif tarifin adım listesi (DataTable'dan kopyalanır).
+	TArray<ECoffeeStep> ActiveSteps;
+
+	// Elde taşınan bardak aktörü (görsel).
+	UPROPERTY()
+	TObjectPtr<AActor> CarriedCupActor;
+
+	// Hazırlamak için sıradaki müşterinin içeceğini bul (sahnedeki service point kuyruğundan).
+	FName FindNextOrderDrinkId() const;
+
+	// Eldeki bardağı oluştur/yok et (görsel).
+	void SpawnCup();
+	void DestroyCup();
 };

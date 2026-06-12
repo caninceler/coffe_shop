@@ -23,9 +23,27 @@ public:
 	virtual void OnInteractionFocusChanged_Implementation(bool bFocused) override;
 
 protected:
+	// Bardağın bırakılacağı/duracağı nokta (NPC buradan alır).
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup Counter")
 	TObjectPtr<USceneComponent> Root;
 
+	// Bardağın yerleşeceği yer (boşsa Root kullanılır).
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Pickup Counter")
+	TObjectPtr<USceneComponent> CupPoint;
+
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Pickup Counter")
 	TObjectPtr<ACoffeeShopCustomerServicePoint> ServicePoint;
+
+	// Tezgahta bekleyen (oyuncunun bıraktığı) bardak. NPC alınca yok edilir.
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Pickup Counter")
+	TObjectPtr<AActor> WaitingCup;
+
+	// NPC bekliyorsa, bardak bırakıldıktan ne kadar sonra "alınsın" (saniye).
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Counter", meta = (ClampMin = "0.0"))
+	float PickupDelaySeconds = 0.6f;
+
+	FTimerHandle PickupTimerHandle;
+
+	// Bekleyen bardağı NPC'ye "ver": serve + bardağı yok et.
+	void CompletePickup();
 };

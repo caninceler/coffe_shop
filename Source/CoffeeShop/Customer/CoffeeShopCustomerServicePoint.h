@@ -51,6 +51,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Customer Service")
 	void RegisterWaitingForDrink(ACoffeeShopCustomerCharacter* Customer);
 
+	// Sıradaki içecek bekleyen müşteri (pickup kuyruğunun başı); yoksa null.
+	// Kahve hazırlama, hangi içeceğin yapılacağını bununla öğrenir.
+	UFUNCTION(BlueprintPure, Category = "Customer Service|Queue")
+	ACoffeeShopCustomerCharacter* GetNextDrinkCustomer() const;
+
 	UFUNCTION(BlueprintCallable, Category = "Customer Service")
 	bool ServeNextDrink();
 

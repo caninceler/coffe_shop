@@ -173,6 +173,18 @@ void ACoffeeShopCustomerServicePoint::RegisterWaitingForDrink(ACoffeeShopCustome
 		PickupQueue.Num());
 }
 
+ACoffeeShopCustomerCharacter* ACoffeeShopCustomerServicePoint::GetNextDrinkCustomer() const
+{
+	for (const TObjectPtr<ACoffeeShopCustomerCharacter>& Customer : PickupQueue)
+	{
+		if (IsValid(Customer))
+		{
+			return Customer;
+		}
+	}
+	return nullptr;
+}
+
 bool ACoffeeShopCustomerServicePoint::ServeNextDrink()
 {
 	CompactQueues();
